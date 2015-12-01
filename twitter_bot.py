@@ -20,7 +20,7 @@ def tweet():
     if tweet is not None:
         text = tweet[0][0:140-tco_length-1]
         api.update_status(text+" "+tweet[1])
-        return text
+    return tweet
 
 if __name__ == "__main__":
     if os.path.isfile(feed_db) == False:

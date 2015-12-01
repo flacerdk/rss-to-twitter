@@ -46,5 +46,6 @@ def choose_tweet(db):
     c.execute("SELECT title, url, id FROM entries WHERE tweeted = 0")
     tweet = c.fetchone()
     if tweet is not None:
-        c.execute("UPDATE entries SET tweeted = 1 WHERE id = ?", tweet[2])
-    return c.fetchone()
+        c.execute("UPDATE entries SET tweeted = 1 WHERE id = ?", (tweet[2],))
+        conn.commit()
+    return tweet
