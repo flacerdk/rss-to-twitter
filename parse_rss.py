@@ -43,9 +43,10 @@ def push_db(entries, db):
 def choose_tweet(db):
     conn = sqlite3.connect(db)
     c = conn.cursor()
-    c.execute("SELECT title, url, id FROM entries WHERE tweeted = 0")
+    c.execute("SELECT title, url, id FROM entries WHERE tweeted = 0 ORDER BY id DESC")
     tweet = c.fetchone()
     if tweet is not None:
         c.execute("UPDATE entries SET tweeted = 1 WHERE id = ?", (tweet[2],))
         conn.commit()
     return tweet
+
