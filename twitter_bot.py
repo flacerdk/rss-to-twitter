@@ -24,7 +24,7 @@ def tweet(feed, db):
     return tweet
 
 if __name__ == "__main__":
-    feed_db = os.path.dirname(os.path.realpath(sys.argv[0]))+FEED_DB
+    feed_db = os.path.dirname(os.path.realpath(sys.argv[0]))+'/'+FEED_DB
     if os.path.isfile(feed_db) == False:
         create_db(feed_db)
     update_db(FEED_URL, feed_db)
