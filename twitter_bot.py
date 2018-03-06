@@ -1,6 +1,6 @@
 from config import *
-import urllib2
-from parse_rss import*
+from urllib.request import urlopen
+from parse_rss import *
 import sys
 import os.path
 import tweepy
@@ -10,7 +10,7 @@ auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 api = tweepy.API(auth)
 
 def update_db(feed, db):
-    rss = urllib2.urlopen(feed)
+    rss = urlopen(feed)
     entries = parse_rss2(rss)
     push_db(entries, db)
 
@@ -29,6 +29,6 @@ if __name__ == "__main__":
         create_db(feed_db)
     update_db(FEED_URL, feed_db)
     if TWEET:
-        print tweet(FEED_URL, feed_db)
+        print(tweet(FEED_URL, feed_db))
     else:
-        print choose_tweet(feed_db)
+        print(choose_tweet(feed_db))

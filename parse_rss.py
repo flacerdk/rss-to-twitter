@@ -49,4 +49,3 @@ def choose_tweet(db, mark=False):
         c.execute("UPDATE entries SET tweeted = 1 WHERE id = ?", (tweet[2],))
         conn.commit()
     return tweet
-
