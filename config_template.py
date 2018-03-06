@@ -1,0 +1,8 @@
+CONSUMER_KEY = ""
+CONSUMER_SECRET = ""
+ACCESS_TOKEN = ""
+ACCESS_SECRET = ""
+
+FEED_URL = ""
+FEED_DB = ""
+TWEET = False
