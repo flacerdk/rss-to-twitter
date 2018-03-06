@@ -1,34 +1,51 @@
-from config import *
-from urllib.request import urlopen
-from parse_rss import *
-import sys
 import os.path
+import sys
+from urllib.request import urlopen
+
 import tweepy
 
-auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
-api = tweepy.API(auth)
+try:
+    import config
+except ModuleNotFoundError:
+    print(
+        '''
+You need a config.py file.
+
+Copy config_template.py to config.py and add your credentials.
+        ''',
+    )
+    sys.exit(1)
+import parse_rss
+
+
+def setup_api():
+    auth = tweepy.OAuthHandler(config.CONSUMER_KEY, config.CONSUMER_SECRET)
+    auth.set_access_token(config.ACCESS_TOKEN, config.ACCESS_SECRET)
+    return tweepy.API(auth)
+
 
 def update_db(feed, db):
     rss = urlopen(feed)
-    entries = parse_rss2(rss)
-    push_db(entries, db)
+    entries = parse_rss.parse_rss2(rss)
+    parse_rss.push_db(entries, db)
 
 
-def tweet(feed, db):
+def tweet(api, feed, db):
     tco_length = api.configuration()[u'short_url_length']
-    tweet = choose_tweet(db, mark=True)
+    tweet = parse_rss.choose_tweet(db, mark=True)
     if tweet is not None:
         text = tweet[0][0:140-tco_length-1]
         api.update_status(text+" "+tweet[1])
     return tweet
 
+
 if __name__ == "__main__":
-    feed_db = os.path.dirname(os.path.realpath(sys.argv[0]))+'/'+FEED_DB
-    if os.path.isfile(feed_db) == False:
-        create_db(feed_db)
-    update_db(FEED_URL, feed_db)
-    if TWEET:
-        print(tweet(FEED_URL, feed_db))
+    feed_db = '{}/{}'.format(os.path.dirname(os.path.realpath(sys.argv[0])), config.FEED_DB)
+    if not os.path.isfile(feed_db):
+        parse_rss.create_db(feed_db)
+    update_db(config.FEED_URL, feed_db)
+    api = setup_api()
+    if config.TWEET:
+        print(tweet(api, config.FEED_URL, feed_db))
     else:
-        print(choose_tweet(feed_db))
+        print(parse_rss.choose_tweet(feed_db))

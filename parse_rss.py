@@ -1,6 +1,6 @@
 from lxml import etree
 import sqlite3
-import os.path
+
 
 def parse_rss2(file_desc):
     tree = etree.parse(file_desc)
@@ -16,6 +16,7 @@ def parse_rss2(file_desc):
         entries.append({"title": title, "url": url, "guid": guid})
     return entries
 
+
 def create_db(db):
     conn = sqlite3.connect(db)
     c = conn.cursor()
@@ -30,6 +31,7 @@ def create_db(db):
     """
     c.execute(schema)
 
+
 def push_db(entries, db):
     conn = sqlite3.connect(db)
     for e in entries:
@@ -39,6 +41,7 @@ def push_db(entries, db):
             values = (e["title"], e["url"], e["guid"], False)
             c.execute("INSERT INTO entries (title,url,guid,tweeted) values (?,?,?,?)", values)
     conn.commit()
+
 
 def choose_tweet(db, mark=False):
     conn = sqlite3.connect(db)
