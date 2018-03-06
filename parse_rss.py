@@ -8,11 +8,13 @@ def parse_rss2(file_desc):
     items = root.find("channel").findall("item")
     entries = []
     for i in items:
-        title = i.find("title").text
-        guid = i.find("guid").text
         link = i.find("link").text
+        if '?' not in link:
+            continue
         link_split = dict([tuple(i.split("=")) for i in link.split("&")])
         url = link_split["url"]
+        title = i.find("title").text
+        guid = i.find("guid").text
         entries.append({"title": title, "url": url, "guid": guid})
     return entries
 
