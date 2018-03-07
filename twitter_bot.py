@@ -34,7 +34,7 @@ def tweet(api, feed, db):
     tco_length = api.configuration()[u'short_url_length']
     tweet = parse_rss.choose_tweet(db, mark=True)
     if tweet is not None:
-        text = tweet[0][0:140-tco_length-1]
+        text = tweet[0][0:280-tco_length-1]
         api.update_status(text+" "+tweet[1])
     return tweet
 
