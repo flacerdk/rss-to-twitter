@@ -1,5 +1,6 @@
 from lxml import etree
 import sqlite3
+from datetime import datetime
 
 
 def parse_rss2(file_desc):
@@ -8,14 +9,15 @@ def parse_rss2(file_desc):
     items = root.find("channel").findall("item")
     entries = []
     for i in items:
-        link = i.find("link").text
-        if '?' not in link:
-            continue
-        link_split = dict([tuple(i.split("=")) for i in link.split("&")])
-        url = link_split["url"]
+        url = i.find("link").text
         title = i.find("title").text
         guid = i.find("guid").text
-        entries.append({"title": title, "url": url, "guid": guid})
+        pub_date = i.find("pubDate").text
+        try:
+            dt = datetime.strptime(pub_date, "%a, %d %b %Y %H:%M:%S %Z")
+        except ValueError:
+            dt = None
+        entries.append({"title": title, "url": url, "guid": guid, "pub_date": dt})
     return entries
 
 
@@ -28,7 +30,8 @@ def create_db(db):
         title  text,
         url    text,
         guid   text not null,
-        tweeted boolean
+        tweeted boolean,
+        pub_date timestamp
     );
     """
     c.execute(schema)
@@ -40,8 +43,8 @@ def push_db(entries, db):
         c = conn.cursor()
         c.execute("SELECT COUNT(guid) FROM entries WHERE guid = ?", (e["guid"],))
         if c.fetchone() == (0,):
-            values = (e["title"], e["url"], e["guid"], False)
-            c.execute("INSERT INTO entries (title,url,guid,tweeted) values (?,?,?,?)", values)
+            values = (e["title"], e["url"], e["guid"], False, e["pub_date"])
+            c.execute("INSERT INTO entries (title,url,guid,tweeted,pub_date) values (?,?,?,?,?)", values)
     conn.commit()
 
 
