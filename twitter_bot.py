@@ -8,11 +8,11 @@ try:
     import config
 except ModuleNotFoundError:
     print(
-        '''
+        """
 You need a config.py file.
 
 Copy config_template.py to config.py and add your credentials.
-        ''',
+        """,
     )
     sys.exit(1)
 import parse_rss
@@ -31,16 +31,18 @@ def update_db(feed, db):
 
 
 def tweet(api, feed, db):
-    tco_length = api.configuration()[u'short_url_length']
+    tco_length = 23
     tweet = parse_rss.choose_tweet(db, mark=True)
     if tweet is not None:
-        text = tweet[0][0:280-tco_length-1]
-        api.update_status(text+" "+tweet[1])
+        text = tweet[0][0 : 280 - tco_length - 1]
+        api.update_status(text + " " + tweet[1])
     return tweet
 
 
 if __name__ == "__main__":
-    feed_db = '{}/{}'.format(os.path.dirname(os.path.realpath(sys.argv[0])), config.FEED_DB)
+    feed_db = "{}/{}".format(
+        os.path.dirname(os.path.realpath(sys.argv[0])), config.FEED_DB
+    )
     if not os.path.isfile(feed_db):
         parse_rss.create_db(feed_db)
     update_db(config.FEED_URL, feed_db)
